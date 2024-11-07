@@ -381,12 +381,12 @@ export class Gems extends Match {
     if (delta.row !== 0 || delta.col !== 0) {
       const targetGem = this.gemAt(
         this.getGemRow(Gems.selectedGem) + delta.row,
-        this.getGemCol(Demo.selectedGem) + delta.col
+        this.getGemCol(Gems.selectedGem) + delta.col
       );
 
       if (targetGem) {
-        Demo.selectedGem.gemSprite.setScale(1);
-        this.swapGems(Demo.selectedGem, targetGem, true);
+        Gems.selectedGem.gemSprite.setScale(1);
+        this.swapGems(Gems.selectedGem, targetGem, true);
       }
     }
   }

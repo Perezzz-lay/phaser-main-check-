@@ -37,8 +37,33 @@ export class Match extends Scene {
    * @returns Возвращает значение bool
    */
   isMatch(row: number, col: number) {
-    return this.isHorizontalMatch(row, col) || this.isVerticalMatch(row, col);
-  }
+    // Подсчет гемов
+    let matchCount = 0;
+    let matchCounts = 0;
+  
+    // Горизонтальная проверка
+    if (this.isHorizontalMatch(row, col)) {
+     matchCount += 3;
+    }
+  
+    // Вертикальная проверка
+    if (this.isVerticalMatch(row, col)) {
+     matchCount += 3;
+    }
+    
+      // Горизонтальная проверка
+      matchCounts += this.countHorizontalMatches(row, col);
+  
+      // Вертикальная проверка
+      matchCounts += this.countVerticalMatches(row, col);
+  
+      // Выводим количество удаленных гемов
+      if (matchCounts > 0) {
+        console.log(`Удалено ${matchCount} гемов`);
+      }
+    console.log(matchCounts)
+    return matchCount > 0; // Возвращаем true, если найдено хотя бы одно совпадение
+   }
 
   /**
    * 
@@ -60,7 +85,9 @@ export class Match extends Scene {
    * @returns Возвращает значение bool
    */
   isVerticalMatch(row: number, col: number) {
+    console.log()
     return (
+      
       this.gemAt(row, col)?.gemColor === this.gemAt(row - 1, col)?.gemColor &&
       this.gemAt(row, col)?.gemColor === this.gemAt(row - 2, col)?.gemColor
     );
@@ -73,15 +100,72 @@ export class Match extends Scene {
    * @returns 
    */
   gemAt(row: number, col: number): Gem | null {
-    if (
-      row < 0 ||
-      row >= gameOptions.fieldSize ||
-      col < 0 ||
-      col >= gameOptions.fieldSize
-    ) {
-      return null;
+    if (row < 0 || row >= gameOptions.fieldSize || col < 0 || col >= gameOptions.fieldSize) {
+        return null;
     }
-    return Match.gameArray[row][col];
+    if (Match.gameArray && Match.gameArray[row] && Match.gameArray[row][col]) {
+        return Match.gameArray[row][col];
+    } else {
+        return null;
+    }
+}
+  countHorizontalMatches(row: number, col: number): number {
+     let matchCount = 0;
+     let currentColor = this.gemAt(row, col)?.gemColor;
+     
+     // Проверяем вправо
+     for (let i = col + 1; i < gameOptions.fieldSize; i++) {
+       const gem = this.gemAt(row, i); // Получаем гем
+       if (gem && gem.gemColor === currentColor) { // Проверяем, не null ли гем
+         matchCount++;
+       } else {
+         break; // Совпадения нет, выходим из цикла
+       }
+     }
+
+    // Проверяем влево
+    for (let i = col - 1; i >= 0; i--) {
+      const gem = this.gemAt(row, i);
+      if (gem && gem.gemColor === currentColor) {
+        matchCount++;
+      } else {
+        break; 
+      }
+    }
+
+    return matchCount >= 2 ? matchCount + 1 : 0;
+  }
+
+  /**
+   * Подсчитывает количество совпадающих гемов по вертикали
+   * @param row строка
+   * @param col столбец
+   * @returns количество совпадающих гемов
+   */
+  countVerticalMatches(row: number, col: number): number {
+    let matchCount = 0;
+    let currentColor = this.gemAt(row, col)?.gemColor;
+    
+    // Проверяем вниз
+    for (let i = row + 1; i < gameOptions.fieldSize; i++) {
+      if (this.gemAt(i, col)?.gemColor === currentColor) {
+        matchCount++;
+      } else {
+        break; // Совпадения нет, выходим из цикла
+      }
+    }
+
+    // Проверяем вверх
+    for (let i = row - 1; i >= 0; i--) {
+      if (this.gemAt(i, col)?.gemColor === currentColor) {
+        matchCount++;
+      } else {
+        break; // Совпадения нет, выходим из цикла
+      }
+    }
+
+    // Возвращаем количество совпадений, учитывая начальный гем
+    return matchCount >= 2 ? matchCount + 1 : 0;
   }
 
   /**
